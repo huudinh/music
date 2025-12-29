@@ -1,12 +1,10 @@
-import SongList from "@/components/SongList";
-import MusicPlayer from "@/components/MusicPlayer";
-
 export default function Home() {
   return (
-    <main className="p-6 pb-24">
-      <h1 className="text-2xl font-bold mb-4">🎧 Dinh Music Player 🎵</h1>
-      <SongList />
-      <MusicPlayer />
+    <main style={{ padding: 60, paddingBottom: 140 }}>
+      <h1 style={{ fontSize: 42 }}>🎧 Nhạc của Định</h1>
+      <p style={{ maxWidth: 500, color: "#b3b3b3" }}>
+        Chúc bạn nghe nhạc vui vẻ
+      </p>
     </main>
   );
 }
