@@ -28,10 +28,10 @@ body {
 
   background-size: cover;
   background-position: center;
-  opacity: .5;
+  opacity: .3;
 
-  /* filter: blur(2px) brightness(0.75); */
-  transform: scale(1.08);
+  filter: blur(12px) brightness(0.75);
+  transform: scale(1.2);
 }
 
 /* ===== PLAYER ===== */
