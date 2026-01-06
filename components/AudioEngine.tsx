@@ -1,43 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePlayer } from "@/store/usePlayer";
+import { usePlayerStore } from "../store/playerStore";
 
 export default function AudioEngine() {
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-
-    const {
-        playlist,
-        index,
-        isPlaying,
-        volume,
-        setProgress,
-        next,
-    } = usePlayer();
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const { playlist, currentIndex, isPlaying } = usePlayerStore();
 
     useEffect(() => {
         if (!audioRef.current) return;
-        isPlaying
-            ? audioRef.current.play()
-            : audioRef.current.pause();
-    }, [isPlaying, index]);
+        isPlaying ? audioRef.current.play() : audioRef.current.pause();
+    }, [isPlaying]);
 
     useEffect(() => {
-        if (audioRef.current)
-            audioRef.current.volume = volume;
-    }, [volume]);
+        if (audioRef.current) {
+            audioRef.current.src = playlist[currentIndex]?.src || "";
+            audioRef.current.play();
+        }
+    }, [currentIndex]);
 
-    return (
-        <audio
-            ref={audioRef}
-            src={playlist[index]?.src}
-            onTimeUpdate={(e) => {
-                const a = e.currentTarget;
-                setProgress(
-                    (a.currentTime / a.duration) * 100 || 0
-                );
-            }}
-            onEnded={next}
-        />
-    );
+    return <audio ref={audioRef} />;
 }
