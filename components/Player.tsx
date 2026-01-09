@@ -51,7 +51,7 @@ export default function Player() {
             </div>
             {/* RIGHT */}
             <div className="player-right">
-                <a href={song.src} download>Tải nhạc</a>
+                <a href={song.src} download>Tải nhạc (^_^)!</a>
             </div>
         </div>
     );
