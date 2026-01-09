@@ -31,75 +31,150 @@ body {
 }
 
 /* ================= ALBUM GRID ================= */
-
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 22px;
-  padding: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  padding: 20px 24px 120px;
+  /* Đảm bảo không bị player che */
 }
 
 .album-card {
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.04),
-      rgba(0, 0, 0, 0.4)),
-    var(--bg-card);
+  background: var(--bg-card);
   border-radius: var(--radius);
-  padding: 16px;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: all 0.25s ease;
-  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  /* Quan trọng: không để card kéo dài vô tận */
 }
 
 .album-card:hover {
   background: var(--bg-hover);
-  transform: translateY(-6px) scale(1.02);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow);
 }
 
-.album-card img {
+/* Container cho ảnh – giữ tỷ lệ vuông */
+.album-cover {
+  position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  /* Giữ ảnh vuông */
+  overflow: hidden;
   border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-.album-card h4 {
-  margin: 12px 0 4px;
+.album-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.album-card:hover .album-cover img {
+  transform: scale(1.08);
+}
+
+/* Thông tin bên dưới */
+.album-info-card {
+  padding: 16px 8px 8px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.album-title {
   font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.album-card small {
+.album-artist {
   font-size: 13px;
   color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.album-header {
-  padding: 12px 16px;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  color: #b3b3b3;
-  font-size: 14px;
-  cursor: pointer;
-  display: inline-flex;
+/* Nút Play hover nổi (giống Spotify) */
+.album-play-button {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  background: var(--green);
+  color: #000;
+  font-size: 24px;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(29, 185, 84, 0.6);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.3s ease;
 }
 
-.back-btn:hover {
-  color: #ffffff;
-  transform: translateX(-4px);
+.album-card:hover .album-play-button {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.player-right a {
-  color: #fff;
+/* ================= RESPONSIVE ALBUM GRID ================= */
+@media (max-width: 1024px) {
+  .album-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+  }
 }
 
+@media (max-width: 768px) {
+  .album-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 18px;
+    padding: 16px 20px 120px;
+  }
+
+  .album-title {
+    font-size: 14px;
+  }
+
+  .album-artist {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .album-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* Cố định 2 cột đều nhau */
+    gap: 16px;
+    padding: 12px 16px 120px;
+  }
+
+  .album-info-card {
+    padding: 12px 6px 6px;
+  }
+
+  .album-play-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    bottom: 8px;
+    right: 8px;
+  }
+}
 
 /* ================= PLAYLIST ================= */
 
@@ -151,78 +226,120 @@ body {
 }
 
 /* ================= PLAYER ================= */
-
 .player {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   height: 90px;
-  background: #181818;
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  align-items: center;
-  padding: 0 20px;
-  border-top: 1px solid #282828;
-}
-
-.player-left {
+  background: linear-gradient(135deg, rgba(24, 24, 24, 0.95), #181818);
+  backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
+  padding: 0 16px;
+  border-top: 1px solid #282828;
+  z-index: 100;
+  gap: 16px;
+}
+
+/* Ba phần chính: left - center - right */
+.player-left,
+.player-center,
+.player-right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  /* Quan trọng: cho phép text truncate */
+}
+
+/* Phần trái: ảnh + thông tin bài hát */
+.player-left {
+  flex: 1;
   gap: 12px;
+  overflow: hidden;
+  /* Tránh tràn */
 }
 
 .player-left img {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 6px;
+  flex-shrink: 0;
 }
 
-.meta .title {
+.player-left .meta {
+  overflow: hidden;
+}
+
+.player-left .title {
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.meta .artist {
+.player-left .artist {
   font-size: 12px;
-  color: #b3b3b3;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Phần giữa: nút điều khiển */
 .player-center {
-  display: flex;
+  flex: 2;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
 }
 
 .controls {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 .controls button {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--text-sub);
   font-size: 18px;
+  opacity: 0.8;
+  transition: all 0.2s;
+  padding: 8px;
+}
+
+.controls button:hover,
+.controls button:active {
+  opacity: 1;
+  color: var(--text-main);
+  transform: scale(1.1);
 }
 
 .controls .play {
   background: #fff;
   color: #000;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
 }
 
 .progress {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: #b3b3b3;
+  color: var(--text-sub);
 }
 
 .bar {
@@ -230,13 +347,303 @@ body {
   height: 4px;
   background: #404040;
   border-radius: 999px;
+  overflow: hidden;
 }
 
 .fill {
   height: 100%;
-  background: #1db954;
+  background: var(--green);
+  width: 0%;
+  /* JS sẽ update */
+  transition: width 0.2s ease;
 }
 
+/* Phần phải: các nút phụ (like, volume, etc.) */
 .player-right {
-  text-align: right;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.player-right button {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 18px;
+  opacity: 0.8;
+  transition: all 0.2s;
+}
+
+.player-right button:hover {
+  opacity: 1;
+  color: var(--text-main);
+}
+
+/* ================= RESPONSIVE PLAYER ================= */
+/* Tablet và nhỏ hơn (dưới 768px) */
+@media (max-width: 768px) {
+  .player {
+    height: 80px;
+    padding: 0 12px;
+    gap: 12px;
+  }
+
+  .player-left img {
+    width: 46px;
+    height: 46px;
+  }
+
+  .controls {
+    gap: 16px;
+  }
+
+  .controls .play {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  /* Ẩn progress bar trên tablet nhỏ để bớt chật */
+  .progress {
+    display: none;
+  }
+}
+
+/* Mobile nhỏ (dưới 480px) */
+@media (max-width: 480px) {
+  .player {
+    height: 72px;
+    padding: 0 8px;
+  }
+
+  .player-left {
+    flex: 1.2;
+  }
+
+  .player-left img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .player-left .title {
+    font-size: 13px;
+  }
+
+  .player-left .artist {
+    font-size: 11px;
+  }
+
+  /* Giữ lại các nút chính: prev, play, next */
+  .controls {
+    gap: 14px;
+  }
+
+  .controls button:not(.play) {
+    font-size: 16px;
+  }
+
+  .controls .play {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  /* Ẩn hoàn toàn player-right trên mobile rất nhỏ nếu cần */
+  /* .player-right { display: none; } */
+}
+
+/* Mobile siêu nhỏ (dưới 360px) */
+@media (max-width: 360px) {
+  .player-left .artist {
+    display: none;
+    /* Ẩn tên artist để ưu tiên tên bài hát */
+  }
+
+  .controls button:not(.play) {
+    display: none;
+    /* Chỉ giữ nút Play để tối ưu không gian */
+  }
+}
+
+/* ================= ALBUM DETAIL HEADER ================= */
+.album-header {
+  padding: 20px 24px;
+  /* Tăng padding để thoáng hơn */
+  position: relative;
+}
+
+.album-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  z-index: -1;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+  padding: 8px 0;
+}
+
+.back-btn:hover {
+  color: var(--text-main);
+  transform: translateX(-6px);
+}
+
+.back-btn::before {
+  content: "←";
+  font-size: 18px;
+}
+
+/* Phần thông tin album chính */
+.album-info {
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  min-height: 240px;
+  /* Đảm bảo chiều cao tối thiểu */
+}
+
+.album-info img {
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+
+.album-info>div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+}
+
+.album-info h2 {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+  word-break: break-word;
+}
+
+.album-info p {
+  font-size: 16px;
+  color: var(--text-sub);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Responsive cho mobile (dưới 640px) */
+@media (max-width: 640px) {
+  .album-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    min-height: auto;
+  }
+
+  .album-info img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .album-info h2 {
+    font-size: 28px;
+  }
+
+  .album-info p {
+    font-size: 15px;
+  }
+
+  .album-header {
+    padding: 16px 20px 0;
+  }
+
+  .back-btn {
+    margin-bottom: 20px;
+  }
+}
+
+/* Responsive nhỏ hơn (dưới 420px) */
+@media (max-width: 420px) {
+  .album-info img {
+    width: 140px;
+    height: 140px;
+  }
+
+  .album-info h2 {
+    font-size: 24px;
+  }
+}
+
+/* ================= CUSTOM SCROLLBAR ================= */
+/* Cho WebKit browsers (Chrome, Safari, Edge mới) */
+::-webkit-scrollbar {
+  width: 8px;
+  /* Thanh cuộn dọc */
+  height: 8px;
+  /* Thanh cuộn ngang (nếu có) */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* Nền track trong suốt */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  /* Màu xám nhẹ, trong suốt */
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+  /* Sáng hơn khi hover */
+}
+
+/* Khi hover vào khu vực có scroll – làm thumb nổi bật hơn */
+.playlist:hover::-webkit-scrollbar-thumb,
+.album-grid:hover::-webkit-scrollbar-thumb,
+body:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Đặc biệt cho phần playlist – đảm bảo luôn thấy nhẹ nhẹ */
+.playlist::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.playlist:hover::-webkit-scrollbar-thumb {
+  background: var(--green);
+  /* Khi hover playlist → thumb xanh Spotify nổi bật */
+  opacity: 0.7;
+}
+
+/* Firefox hỗ trợ scrollbar styling hạn chế hơn, nhưng vẫn đẹp */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.playlist {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.playlist:hover {
+  scrollbar-color: var(--green) transparent;
 }

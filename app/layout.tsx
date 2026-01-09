@@ -1,22 +1,32 @@
 import "./globals.css";
+import type { Metadata } from "next";
+import Providers from "./providers"; // Đường dẫn đến file providers.tsx trên
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Nhạc của Định",
-  manifest: "/manifest.json",
+  description: "Ứng dụng nghe nhạc PWA cá nhân",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Nhạc của Định",
+  },
+  // Các meta khác cho PWA (Next.js sẽ tự generate link manifest nếu có file manifest.ts)
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="vi">
       <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
+        {/* Apple touch icon (Next.js tự generate nếu có file icons, nhưng giữ thủ công nếu cần) */}
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
