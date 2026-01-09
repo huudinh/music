@@ -1,6 +1,16 @@
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//     reactStrictMode: true,
+// };
+
+// module.exports = nextConfig;
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    distDir: "build",
+    output: "export",
+    basePath: "/mp3",
+    assetPrefix: "/mp3",
 };
 
-module.exports = nextConfig;
+export default nextConfig;

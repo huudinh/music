@@ -30,6 +30,17 @@ body {
   padding-bottom: 110px;
 }
 
+a {
+  color: #a7a7a7;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #eee;
+  transition: all 0.3s ease;
+}
+
 /* ================= ALBUM GRID ================= */
 .album-grid {
   display: grid;
