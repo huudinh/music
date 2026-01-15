@@ -1,7 +1,6 @@
-// components/Player.tsx
 "use client";
 
-import { useEffect } from "react"; // ← Thêm import này nếu chưa có
+import { useEffect } from "react";
 import { usePlayerStore } from "../store/playerStore";
 import AudioProgress from "./AudioProgress";
 import {
@@ -9,7 +8,20 @@ import {
     Pause,
     SkipBack,
     SkipForward,
+    Share2,
+    Download,
 } from "lucide-react";
+import { shareContent } from "../utils/share";
+
+
+// ================= HELPERS =================
+const slugify = (str: string) =>
+    str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
 
 export default function Player() {
     const {
@@ -23,17 +35,32 @@ export default function Player() {
 
     const song = playlist[currentIndex];
 
-    // ← THÊM ĐOẠN NÀY: Cập nhật title tab browser
+    // ================= UPDATE TAB TITLE =================
     useEffect(() => {
         if (song) {
             const status = isPlaying ? "▶" : "⏸";
             document.title = `${status} ${song.title} - ${song.artist} | Nhạc của Định`;
         } else {
-            document.title = "Nhạc của Định"; // Title mặc định khi không phát nhạc
+            document.title = "Nhạc của Định";
         }
-    }, [song, isPlaying]); // Chạy lại khi đổi bài hoặc play/pause
+    }, [song, isPlaying]);
 
-    if (!song) return null; // Giữ nguyên để ẩn player nếu chưa chọn bài
+    if (!song) return null;
+
+    // ================= SHARE SONG =================
+    const shareSong = () => {
+        const songSlug = slugify(song.title);
+
+        // lấy album slug hiện tại từ hash
+        const hash = window.location.hash.replace("#", "");
+        const albumSlug = hash.split("/")[0] || "nhac-song";
+
+        shareContent({
+            title: song.title,
+            text: `🎵 ${song.title} – ${song.artist}`,
+            url: `#${albumSlug}/${songSlug}`,
+        });
+    };
 
     return (
         <div className="player">
@@ -45,15 +72,19 @@ export default function Player() {
                     <div className="artist">{song.artist}</div>
                 </div>
             </div>
+
             {/* CENTER */}
             <div className="player-center">
-
                 <div className="controls">
                     <button onClick={prev} aria-label="Previous">
                         <SkipBack size={22} />
                     </button>
 
-                    <button className="play" onClick={togglePlay} aria-label="Play / Pause">
+                    <button
+                        className="play"
+                        onClick={togglePlay}
+                        aria-label="Play / Pause"
+                    >
                         {isPlaying ? <Pause size={26} /> : <Play size={26} />}
                     </button>
 
@@ -61,13 +92,20 @@ export default function Player() {
                         <SkipForward size={22} />
                     </button>
                 </div>
+
                 <AudioProgress />
             </div>
+
             {/* RIGHT */}
             <div className="player-right">
-                <a href={song.src} download>Tải nhạc (^_^)!</a>
+                <button onClick={shareSong} aria-label="Share song">
+                    <Share2 size={18} />
+                </button>
+
+                <a href={song.src} download>
+                    <Download size={16} /> Tải nhạc
+                </a>
             </div>
         </div>
     );
 }
-

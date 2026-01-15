@@ -588,6 +588,19 @@ a:hover {
   font-weight: 500;
 }
 
+.album-share {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.album-share:hover {
+  opacity: 1;
+}
+
+
 /* Responsive cho mobile (dưới 640px) */
 @media (max-width: 640px) {
   .album-info {
