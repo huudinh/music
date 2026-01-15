@@ -389,6 +389,37 @@ a:hover {
   color: var(--text-main);
 }
 
+.player .controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.player .controls button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.player .controls .play {
+  width: 48px;
+  height: 48px;
+  background: #1db954;
+  /* Spotify vibe */
+  color: #000;
+}
+
+.player .controls .play:hover {
+  background: #1ed760;
+}
+
+
 /* ================= RESPONSIVE PLAYER ================= */
 /* Tablet và nhỏ hơn (dưới 768px) */
 @media (max-width: 768px) {

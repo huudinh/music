@@ -1,8 +1,15 @@
+// components/Player.tsx
 "use client";
 
 import { useEffect } from "react"; // ← Thêm import này nếu chưa có
 import { usePlayerStore } from "../store/playerStore";
 import AudioProgress from "./AudioProgress";
+import {
+    Play,
+    Pause,
+    SkipBack,
+    SkipForward,
+} from "lucide-react";
 
 export default function Player() {
     const {
@@ -40,12 +47,19 @@ export default function Player() {
             </div>
             {/* CENTER */}
             <div className="player-center">
+
                 <div className="controls">
-                    <button onClick={prev}>⏮</button>
-                    <button className="play" onClick={togglePlay}>
-                        {isPlaying ? "⏸" : "▶"}
+                    <button onClick={prev} aria-label="Previous">
+                        <SkipBack size={22} />
                     </button>
-                    <button onClick={next}>⏭</button> {/* Nếu bạn đã thêm nút next */}
+
+                    <button className="play" onClick={togglePlay} aria-label="Play / Pause">
+                        {isPlaying ? <Pause size={26} /> : <Play size={26} />}
+                    </button>
+
+                    <button onClick={next} aria-label="Next">
+                        <SkipForward size={22} />
+                    </button>
                 </div>
                 <AudioProgress />
             </div>
@@ -56,3 +70,4 @@ export default function Player() {
         </div>
     );
 }
+

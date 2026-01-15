@@ -1,3 +1,4 @@
+// components/AudioEngine.tsx
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -26,18 +27,35 @@ export default function AudioEngine() {
     }, [isPlaying]);
 
     // 2. Cập nhật src khi chuyển bài + tự động play nếu đang ở trạng thái phát
+    // useEffect(() => {
+    //     if (!audioRef.current || !currentSong) return;
+
+    //     audioRef.current.src = currentSong.src;
+
+    //     // Chỉ tự động play khi người dùng đang ở trạng thái phát (tránh play tự động khi mới load trang)
+    //     if (isPlaying) {
+    //         audioRef.current
+    //             .play()
+    //             .catch((e) => console.warn("Auto play failed:", e));
+    //     }
+    // }, [currentIndex, currentSong, isPlaying]);
+
     useEffect(() => {
         if (!audioRef.current || !currentSong) return;
 
-        audioRef.current.src = currentSong.src;
+        const audio = audioRef.current;
 
-        // Chỉ tự động play khi người dùng đang ở trạng thái phát (tránh play tự động khi mới load trang)
+        audio.src = currentSong.src;
+        audio.currentTime = 0; // reset khi đổi bài (đúng)
+
+        // chỉ auto play khi đang ở trạng thái phát
         if (isPlaying) {
-            audioRef.current
+            audio
                 .play()
-                .catch((e) => console.warn("Auto play failed:", e));
+                .catch(e => console.warn("Auto play failed:", e));
         }
-    }, [currentIndex, currentSong, isPlaying]);
+    }, [currentIndex]); // ✅ CHỈ KHI ĐỔI BÀI
+
 
     // 3. TỰ ĐỘNG CHUYỂN BÀI TIẾP THEO KHI BÀI HIỆN TẠI KẾT THÚC
     useEffect(() => {
