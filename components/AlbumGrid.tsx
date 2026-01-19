@@ -7,7 +7,6 @@ import Playlist from "./Playlist";
 import { Share2 } from "lucide-react";
 import { shareContent } from "../utils/share";
 
-
 // ================= TYPES =================
 export interface Song {
     id: number;
@@ -34,24 +33,28 @@ const slugify = (str: string) =>
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-// ================= FETCH =================
+// ================= FETCH (NO CACHE) =================
 const fetchAlbums = async (): Promise<Album[]> => {
-    const response = await fetch(
-        "https://huudinh.io.vn/wp-json/album-manager/v1/albums"
+    const res = await fetch(
+        "https://huudinh.io.vn/wp-json/album-manager/v1/albums",
+        {
+            cache: "no-store", // ❗ BẮT BUỘC realtime
+        }
     );
 
-    if (!response.ok) {
+    if (!res.ok) {
         throw new Error("Không thể tải danh sách album");
     }
 
-    return response.json();
+    return res.json();
 };
 
 // ================= COMPONENT =================
 export default function AlbumGrid() {
-    const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+    const [albumSlug, setAlbumSlug] = useState<string | null>(null);
     const setPlaylist = usePlayerStore((s) => s.setPlaylist);
 
+    // ===== REALTIME QUERY =====
     const {
         data: albums = [],
         isLoading,
@@ -60,42 +63,54 @@ export default function AlbumGrid() {
     } = useQuery<Album[], Error>({
         queryKey: ["albums"],
         queryFn: fetchAlbums,
-        staleTime: 1000 * 60 * 10,
-        gcTime: 1000 * 60 * 30,
+
+        // 🔥 REALTIME
+        refetchInterval: 15_000, // 15s
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
     });
 
-    // ================= HASH → ALBUM =================
+    // ===== HASH → SLUG =====
     useEffect(() => {
-        if (!albums.length) return;
+        const syncFromHash = () => {
+            const hash = window.location.hash.replace("#", "");
+            if (!hash) {
+                setAlbumSlug(null);
+                return;
+            }
 
-        const hash = window.location.hash.replace("#", "");
-        if (!hash) return;
+            setAlbumSlug(hash.split("/")[0]);
+        };
 
-        // ✅ CHỈ LẤY ALBUM SLUG (TRƯỚC /)
-        const albumSlug = hash.split("/")[0];
+        syncFromHash();
+        window.addEventListener("hashchange", syncFromHash);
 
-        const found = albums.find(
-            (a) => slugify(a.title) === albumSlug
-        );
+        return () => {
+            window.removeEventListener("hashchange", syncFromHash);
+        };
+    }, []);
 
-        if (found) {
-            setSelectedAlbum(found);
-            setPlaylist(found.songs);
+    // ===== SLUG → ALBUM =====
+    const selectedAlbum =
+        albumSlug &&
+        albums.find((a) => slugify(a.title) === albumSlug);
+
+    // ===== SYNC PLAYLIST =====
+    useEffect(() => {
+        if (selectedAlbum) {
+            setPlaylist(selectedAlbum.songs);
         }
-    }, [albums, setPlaylist]);
+    }, [selectedAlbum, setPlaylist]);
 
     // ================= ACTIONS =================
     const openAlbum = (album: Album) => {
         const slug = slugify(album.title);
         window.location.hash = slug;
-
-        setSelectedAlbum(album);
-        setPlaylist(album.songs);
     };
 
     const closeAlbum = () => {
         window.location.hash = "";
-        setSelectedAlbum(null);
     };
 
     const shareAlbum = (album: Album) => {
