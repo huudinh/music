@@ -27,18 +27,6 @@ export default function AudioEngine() {
     }, [isPlaying]);
 
     // 2. Cập nhật src khi chuyển bài + tự động play nếu đang ở trạng thái phát
-    // useEffect(() => {
-    //     if (!audioRef.current || !currentSong) return;
-
-    //     audioRef.current.src = currentSong.src;
-
-    //     // Chỉ tự động play khi người dùng đang ở trạng thái phát (tránh play tự động khi mới load trang)
-    //     if (isPlaying) {
-    //         audioRef.current
-    //             .play()
-    //             .catch((e) => console.warn("Auto play failed:", e));
-    //     }
-    // }, [currentIndex, currentSong, isPlaying]);
 
     useEffect(() => {
         if (!audioRef.current || !currentSong) return;

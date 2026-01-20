@@ -3,6 +3,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Providers from "./providers"; // Đường dẫn đến file providers.tsx trên
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Nhạc của Định",
@@ -28,6 +29,7 @@ export default function RootLayout({
       </head>
       <body>
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );
